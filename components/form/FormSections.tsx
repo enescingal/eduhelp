@@ -173,6 +173,26 @@ export function FormSections() {
         </Section>
       )}
 
+      {/* Temel ders saatleri */}
+      <Section title="Temel Ders Saatleri" icon={Clock}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <HourInput id="h-gunduz" label="Gündüz" value={s.hours.gunduz}
+            onChange={(n) => s.setHour("gunduz", n)} />
+          <HourInput id="h-nobet" label="Nöbet" value={s.hours.nobet}
+            onChange={(n) => s.setHour("nobet", n)} />
+          <HourInput id="h-gece" label="Gece" value={s.hours.gece}
+            onChange={(n) => s.setHour("gece", n)} />
+          <HourInput id="h-belleticilik" label="Belleticilik" value={s.hours.belleticilik}
+            onChange={(n) => s.setHour("belleticilik", n)} />
+          <HourInput id="h-sinav" label="Sınav" value={s.hours.sinav}
+            onChange={(n) => s.setHour("sinav", n)} />
+          <HourInput id="h-egzersiz" label="Egzersiz" value={s.hours.egzersiz}
+            onChange={(n) => s.setHour("egzersiz", n)} />
+          <HourInput id="h-hizmetici" label="Hizmet İçi" value={s.hours.hizmetici}
+            onChange={(n) => s.setHour("hizmetici", n)} />
+        </div>
+      </Section>
+
       {/* Vergi istisnaları */}
       <Section
         title="Vergi İstisnaları (Faydalanılan)"
@@ -200,26 +220,6 @@ export function FormSections() {
             }
             max={stampMax}
           />
-        </div>
-      </Section>
-
-      {/* Temel ders saatleri */}
-      <Section title="Temel Ders Saatleri" icon={Clock}>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          <HourInput id="h-gunduz" label="Gündüz" value={s.hours.gunduz}
-            onChange={(n) => s.setHour("gunduz", n)} />
-          <HourInput id="h-nobet" label="Nöbet" value={s.hours.nobet}
-            onChange={(n) => s.setHour("nobet", n)} />
-          <HourInput id="h-gece" label="Gece" value={s.hours.gece}
-            onChange={(n) => s.setHour("gece", n)} />
-          <HourInput id="h-belleticilik" label="Belleticilik" value={s.hours.belleticilik}
-            onChange={(n) => s.setHour("belleticilik", n)} />
-          <HourInput id="h-sinav" label="Sınav" value={s.hours.sinav}
-            onChange={(n) => s.setHour("sinav", n)} />
-          <HourInput id="h-egzersiz" label="Egzersiz" value={s.hours.egzersiz}
-            onChange={(n) => s.setHour("egzersiz", n)} />
-          <HourInput id="h-hizmetici" label="Hizmet İçi" value={s.hours.hizmetici}
-            onChange={(n) => s.setHour("hizmetici", n)} />
         </div>
       </Section>
 

@@ -39,7 +39,12 @@ function Stat({
   );
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <span className={cn("text-xs", size === "xl" ? "text-sm font-medium" : "text-muted-foreground")}>
+      <span
+        className={cn(
+          "text-xs",
+          size === "xl" ? "text-sm font-medium" : "text-muted-foreground",
+        )}
+      >
         {label}
       </span>
       <span className={valueClass}>
@@ -51,50 +56,56 @@ function Stat({
 }
 
 export function LiveResultPanel() {
-  const [showDetail, setShowDetail] = React.useState(false);
   const input = useFormStore(useShallow(selectCalculationInput));
-
   const result = React.useMemo(() => calculateEduhep(input, RATES), [input]);
-
   const periodLabel = RATES.periods[input.budgetPeriod]?.label ?? input.budgetPeriod;
+
+  // Default open on desktop, closed on mobile. We initialise to false so the
+  // SSR/initial render matches mobile-first; useEffect promotes to open on
+  // desktop after hydration.
+  const [open, setOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOpen(window.matchMedia("(min-width: 1024px)").matches);
+    }
+  }, []);
 
   return (
     <Card className="border-2 shadow-md">
-      <CardHeader>
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-2">
           <CardTitle>Hesaplama Sonucu</CardTitle>
           <Badge variant="outline" className="text-[10px]">{periodLabel}</Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <Stat label="Brüt Ücret" value={result.grossAmount} variant="muted" />
-        <Stat
-          label={`Gelir Vergisi (%${(result.appliedIncomeTaxRate * 100).toFixed(0)})`}
-          value={result.incomeTax}
-          variant="negative"
-        />
-        <Stat label="Damga Vergisi" value={result.stampTax} variant="negative" />
-        <Separator />
+      <CardContent className="space-y-3 pt-0">
         <Stat label="Net Ücret" value={result.netAmount} variant="primary" size="xl" />
 
-        {result.warnings.length > 0 && (
-          <div className="rounded-md bg-destructive/10 border border-destructive/30 p-3 space-y-1">
-            <div className="flex items-center gap-2 text-xs font-medium text-destructive">
-              <AlertTriangle className="h-3.5 w-3.5" />
-              Dikkat
-            </div>
-            <ul className="text-[11px] text-destructive/90 space-y-0.5 list-disc pl-4">
-              {result.warnings.map((w, i) => <li key={i}>{w}</li>)}
-            </ul>
-          </div>
-        )}
+        <Collapsible open={open} onOpenChange={setOpen}>
+          <CollapsibleContent className="space-y-3 pt-1 data-[state=closed]:animate-none">
+            <Separator />
+            <Stat label="Brüt Ücret" value={result.grossAmount} variant="muted" />
+            <Stat
+              label={`Gelir Vergisi (%${(result.appliedIncomeTaxRate * 100).toFixed(0)})`}
+              value={result.incomeTax}
+              variant="negative"
+            />
+            <Stat label="Damga Vergisi" value={result.stampTax} variant="negative" />
 
-        <Collapsible open={showDetail} onOpenChange={setShowDetail}>
-          <CollapsibleTrigger className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors w-full justify-center pt-1">
-            Detayları {showDetail ? "Gizle" : "Göster"}
-            <ChevronDown className={cn("h-3 w-3 transition-transform", showDetail && "rotate-180")} />
-          </CollapsibleTrigger>
-          <CollapsibleContent className="pt-3">
+            {result.warnings.length > 0 && (
+              <div className="rounded-md bg-destructive/10 border border-destructive/30 p-3 space-y-1">
+                <div className="flex items-center gap-2 text-xs font-medium text-destructive">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  Dikkat
+                </div>
+                <ul className="text-[11px] text-destructive/90 space-y-0.5 list-disc pl-4">
+                  {result.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                </ul>
+              </div>
+            )}
+
+            <Separator />
+
             <div className="space-y-2">
               <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
                 Kalemler
@@ -120,19 +131,32 @@ export function LiveResultPanel() {
                   ))}
                 </ul>
               )}
+
               <Separator className="my-2" />
+
               <div className="text-[11px] space-y-1 text-muted-foreground">
                 <div className="flex justify-between">
                   <span>GV İstisnası (kalan vergi tutarı)</span>
-                  <span className="tabular-nums">{formatTL(result.remainingIncomeTaxExemption)}</span>
+                  <span className="tabular-nums">
+                    {formatTL(result.remainingIncomeTaxExemption)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>DV İstisnası (kalan matrah)</span>
-                  <span className="tabular-nums">{formatTL(result.remainingStampTaxExemption)}</span>
+                  <span className="tabular-nums">
+                    {formatTL(result.remainingStampTaxExemption)}
+                  </span>
                 </div>
               </div>
             </div>
           </CollapsibleContent>
+
+          <CollapsibleTrigger className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors w-full justify-center pt-2">
+            Detayları {open ? "Gizle" : "Göster"}
+            <ChevronDown
+              className={cn("h-3 w-3 transition-transform", open && "rotate-180")}
+            />
+          </CollapsibleTrigger>
         </Collapsible>
       </CardContent>
     </Card>
